@@ -6,7 +6,9 @@ html
     div.page.center
       h2#welcome Welcome, #{username}!
       div
-        if avatar
+        if photo
+          img.photo(src=`${photo}`)
+        else if avatar
           img.avatar(src=`${avatar}`)
       hr
       p

@@ -16,7 +16,7 @@ module.exports = function (app, myDatabase) {
       console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
-        message: 'Welcome back, ' + req.user.username, 
+        message: 'Welcome back, ' + req.user.name,
         showLogin: false,
         showRegistration: false,
         showSocialAuth: false,
@@ -38,7 +38,7 @@ module.exports = function (app, myDatabase) {
       console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
-        message: 'Welcome back, ' + req.user.username, 
+        message: 'Welcome back, ' + req.user.name, 
         showLogin: false,
         showRegistration: false,
         showSocialAuth: false,
@@ -60,7 +60,7 @@ module.exports = function (app, myDatabase) {
       console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
-        message: 'Welcome back, ' + req.user.username, 
+        message: 'Welcome back, ' + req.user.name, 
         showLogin: false,
         showRegistration: false,
         showSocialAuth: false,
@@ -82,7 +82,7 @@ module.exports = function (app, myDatabase) {
   });
   
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
-    res.render(process.cwd() + '/views/pug/profile', { loggedIn: true, username: req.user.username, avatar: req.user.avatar });
+    res.render(process.cwd() + '/views/pug/profile', { loggedIn: true, username: req.user.name, avatar: req.user.avatar, photo: req.user.photo });
   });
 
   app.route('/chat').get(ensureAuthenticated, (req, res) => {
@@ -107,6 +107,7 @@ module.exports = function (app, myDatabase) {
           myDatabase.insertOne({
             username: req.body.username,
             password: hash,
+            name: req.body.username,
             avatar: avatars[rand]
           }, (err, doc) => {
               if (err) {

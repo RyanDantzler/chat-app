@@ -373,10 +373,14 @@ header.nav-open ~ #nav-container #nav-content {
 
 /* Profile */
 
-.avatar {
+.avatar, .photo {
   width: 400px;
   max-width: 80%;
   margin-bottom: 20px;
+}
+
+.photo {
+  border-radius: 50%;
 }
 
 @media only screen and (min-width: 600px) {
