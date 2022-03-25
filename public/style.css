@@ -1,64 +1,421 @@
-.border {
-  border-style: inset;
-  border-width: 1px;
-  margin: 10px;
+@import url('https://fonts.googleapis.com/css?family=Encode+Sans+Condensed:400,600');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
 }
 
-.center {
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Encode Sans Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: #212121;
+}
+
+header {
+  display: flex;
+  position: fixed;
+  width: 100%;
+  height: 70px;
+/*   background: #212121; */
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+a,
+a:visited,
+a:focus,
+a:active,
+a:link {
+  text-decoration: none;
+  outline: 0;
+  color: #333;
+}
+
+p {
+  line-height: 1.5;
+  font-weight: 200;
+  margin: 20px 0;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+}
+
+h2 {
+  margin: 10px 0;
+}
+
+hr {
+  margin-top: 3px;
+}
+
+hr.or {
+  margin: 3px 0 30px;
+  overflow: visible;
+  position: relative;
+}
+
+hr.or:before {
+  content: "or";
+  position: absolute;
+  left: calc(50% - 20px);
+  top: -12px;
+  width: 40px;
+  background: white;
+  text-align: center;
+  font-weight: normal;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  vertical-align: middle;
+  height: auto;
+  width: 100%;
+}
+
+strong {
+  font-weight: 600;
+}
+
+span {
+  color: #BF7497;
+}
+
+input, a.submit, button {
+  margin-bottom: 15px;
+  width: 100%;
+  color: #000;
+  display: inline-block;
+  -webkit-appearance: none;
+  border-radius: 0;
+  font-size: 14px;
+  font-family: sans-serif;
+}
+
+input[type="text"], input[type="password"], textarea {
+    padding: 11px 10px 8px;
+}
+
+input[type="submit"], a.submit, button {
+  padding: 14px;
+  background-color: #BF7497;
+  border: none;
+  color: white;
+  font-weight: normal;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover, a.submit:hover, button:hover {
+  opacity: .9;
+}
+
+.page {
+  padding: 20px 20px 0;
+  margin: 0 auto;
+}
+
+.center h2, .center p, .center div, .center form {
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+  width: 400px;
+  max-width: 100%;
 }
 
-div > input {
-  margin: 0.5rem;
+.center.form {
+  padding-top: 0;
+}
+
+a.github {
+  background-color: #333;
+  position: relative;
+}
+
+a.secondary {
+  background: white;
+  color: #BF7497;
+  padding: 11px;
+  width: auto;
+}
+
+a.secondary:hover {
+  background: #eee;
+}
+
+a.submit.google {
+  background: #4285F4;
+  position: relative;
+  border: 3px solid #4285F4;
+  padding: 11px;
+}
+
+.submit div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: white;
+  padding: 9px 0;
+  height: 100%;
+  width: 48px;
+}
+
+.github svg {
+  fill: white;
+}
+
+.github div {
+  background: none;
+  padding: 7px 10px;
+}
+
+#nav-container {
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+#nav-container .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 70px);
+  visibility: hidden;
+  opacity: 0;
+  transition: .3s;
+  background: #000;
+}
+header.nav-open ~ #nav-container .bg {
+  visibility: visible;
+  opacity: .6;
+}
+
+.menu-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 1;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  height: 70px;
+  width: 30px;
+  cursor: pointer;
+  pointer-events: auto;
+  margin-left: 25px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+.icon-bar {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #aaa;
+  transition: transform .3s, opacity .3s;
+}
+.icon-bar + .icon-bar {
+  margin-top: 5px;
+}
+
+header.nav-open ~ #nav-container .icon-bar:nth-of-type(1) {
+  transform: translate3d(0,8px,0) rotate(45deg);
+}
+header.nav-open ~ #nav-container .icon-bar:nth-of-type(2) {
+  opacity: 0;
+}
+header.nav-open ~ #nav-container .icon-bar:nth-of-type(3) {
+  transform: translate3d(0,-8px,0) rotate(-45deg);
+}
+
+#nav-content {
+  margin-top: 0px;
+  padding: 90px 20px 20px;
+  width: 90%;
+  max-width: 300px;
+  position: absolute;
+  top: 0;
+  left: -100%;
+  height: calc(100% - 70px);
+  background: #ececec;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  transition: left .3s;
+  will-change: left;
+  contain: paint;
+}
+
+#nav-content ul {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#nav-content li a {
+  padding: 10px 5px;
+  display: block;
+  text-transform: uppercase;
+  transition: color .1s;
+}
+
+#nav-content li a:hover {
+  color: #BF7497;
+}
+
+#nav-content li:not(.small) + .small {
+  margin-top: auto;
+}
+
+.small {
+  display: flex;
+  align-self: center;
+}
+
+.small a {
+  font-size: 12px;
+  font-weight: 400;
+  color: #888;
+}
+.small a + a {
+  margin-left: 15px;
+}
+
+header.nav-open ~ #nav-container #nav-content {
+  left: 0;
+}
+
+.content {
+  text-align: center;
+}
+
+.content h2 {
+    margin-bottom: 20px;
+}
+
+.content, .content div {
+  width: 600px;
+  max-width: 100%;
 }
 
 .login {
-  border: solid 2px #777;
-  width: 50%;
-  background-color: aliceblue;
+  margin-bottom: 60px;
 }
 
-a.text {
-  text-decoration: none;
-  font-weight: 700;
+.login p {
+  color: #BF7497;
+  text-align: center;
 }
 
-form {
-  padding: 3px;
-  width: 500px;
+.login .login-error {
+  opacity: 0;
+  height: 0;
 }
 
-form input {
-  background-color: #eee;
-  border: green solid 2px;
-  padding: 10px; 
-  width: 90%; 
-  margin-right: .5%;
+.login div {
+  width: 400px;
 }
 
-form button { 
-  width: 9%;
-  background: rgb(130, 224, 255);
-  border: none; 
-  padding: 10px; 
+.create-account {
+  border-top: 1px solid black;
+  padding-top: 25px;
+  margin: 25px auto;
+  width: 400px;
 }
+
+.button {
+  font-size: 16px;
+  display: block;
+  text-align: center;
+}
+
+.register {
+  display:  none;
+}
+/* Chat */
 
 #messages { 
   list-style-type: none;
   text-align: left;
-  margin: 0;
+  margin: 0 0 20px;
   padding: 0;
   height: 20em;
   overflow: scroll;
   overflow-x: hidden;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 #messages li { 
   padding: 5px 10px;
+  font-weight: normal;
 }
 
 #messages li:nth-child(odd) { 
   background: #eee;
+}
+
+/* Profile */
+
+.avatar {
+  width: 400px;
+  max-width: 80%;
+  margin-bottom: 20px;
+}
+
+@media only screen and (min-width: 600px) {
+  br {
+    display: none;
+  }
+  h2 {
+    padding-top: 20px;
+  }
+  .center h2, .center p {
+    width: 600px;
+  }
+  .page {
+    padding-top: 70px;
+    width: 600px;
+  }
+  .page .chat {
+    width: 100%;
+  }
+  .page .chat-box {
+    width: 100%;
+  }
+  ul#messages {
+      width: 100%;
+  }
+  .chat-box div {
+      width: 100%;
+  }
+
+  form.chat-input {
+    width: 100%;
+  }
+  
+  input#m {
+      width: 75%;
+      float: left;
+      padding: 13px 10px 10px;
+  }
+  .chat-box button {
+      width: 20%;
+  }
 }

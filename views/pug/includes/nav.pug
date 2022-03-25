@@ -1,0 +1,20 @@
+div#nav-container
+  div.bg
+  div.menu-button
+    span.icon-bar
+    span.icon-bar
+    span.icon-bar
+  div#nav-content
+    ul
+      li
+        a(href='/') Home
+      if loggedIn
+        li
+          a(href='/chat') Chat
+        li
+          a(href='/profile') Profile
+        li
+          a(href='/logout') Logout
+      else
+        li
+          a(href='/') Sign in
