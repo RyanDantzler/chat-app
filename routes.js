@@ -1,5 +1,19 @@
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+const { body, validationResult } = require('express-validator');
+
+const validate = validations => {
+  return async (req, res, next) => {
+    await Promise.all(validations.map(validation => validation.run(req)));
+
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+      return next();
+    }
+    
+    res.send({ error: errors.array({ onlyFirstError: true })[0].msg });
+  }
+};
 
 const avatars = [
   'https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Blonde&facialHairType=BeardMajestic&facialHairColor=Blonde&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Pizza&eyeType=Wink&eyebrowType=SadConcernedNatural&mouthType=Smile&skinColor=Light',
@@ -77,9 +91,13 @@ module.exports = function (app, myDatabase) {
     }
   });
 
-  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
-  });
+  app.route('/login').post(validate([
+      body('username', 'Username is a required field.').exists(),
+      body('password', 'Password is a required field.').exists()
+    ]),
+    passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+      res.redirect('/profile');
+    });
   
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
     res.render(process.cwd() + '/views/pug/profile', { loggedIn: true, username: req.user.name, avatar: req.user.avatar, photo: req.user.photo });
@@ -94,14 +112,17 @@ module.exports = function (app, myDatabase) {
     res.redirect('/');
   });
   
-  app.route('/register').post(
+  app.route('/register').post(validate([
+      body('username', 'Username is a required field.').exists(),
+      body('password', 'Password is a required field.').exists()
+    ]),
     (req, res, next) => {
       const hash = bcrypt.hashSync(req.body.password, 12);
       myDatabase.findOne({ username: req.body.username }, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {
-          res.redirect('/');
+          res.redirect('/'); // TODO: alert user that username is taken
         } else {
           let rand = Math.floor(Math.random() * 6);
           myDatabase.insertOne({
@@ -125,8 +146,7 @@ module.exports = function (app, myDatabase) {
     passport.authenticate('local', { failureRedirect: '/' }),
     (req, res, next) => {
       res.redirect('/profile');
-    }
-  );
+    });
 
   app.route('/auth/github').get(passport.authenticate('github'));
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
