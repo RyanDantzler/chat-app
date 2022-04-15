@@ -19,7 +19,7 @@ const store = new MongoStore({ url: URI });
 app.set('view engine', 'pug');
 
 app.use('/public', express.static(process.cwd() + '/public'));
-app.use(express.json());
+app.use(express.json({ limit: "100kb" })); // Limits the request body size passed. Default is 100kb
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
@@ -82,6 +82,7 @@ myDB(async client => {
     });
   });
 }).catch((e) => {
+  console.log(e);
   app.route('/').get((req, res) => {
     res.render('pug', { title: e, message: 'Unable to login' });
   });

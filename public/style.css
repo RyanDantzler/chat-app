@@ -123,6 +123,39 @@ input[type="submit"]:hover, a.submit:hover, button:hover {
   opacity: .9;
 }
 
+.error-msg {
+  color: #b63e3e;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+#register-form .error-msg {
+  text-align: left;
+  padding-left: 25px;
+}
+
+.error-msg:last-child {
+  margin-bottom: 20px;
+}
+
+.error-msg:before {
+  content: '\d7';
+  color: #b63e3e;
+/*   background: #b63e3e; */
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: text-top;
+  position: relative;
+  left: -5px;
+  top: 2px;
+  font-size: 23px;
+  font-weight: bold;
+/*   top: 3px;
+  font-size: 22px; */
+  padding: 0 2px 1px 3px;
+  line-height: 16px;
+}
+
 .page {
   padding: 20px 20px 0;
   margin: 0 auto;
@@ -194,7 +227,7 @@ a.submit.google {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 70px);
+  height: 100%;
   visibility: hidden;
   opacity: 0;
   transition: .3s;
@@ -252,7 +285,7 @@ header.nav-open ~ #nav-container .icon-bar:nth-of-type(3) {
   position: absolute;
   top: 0;
   left: -100%;
-  height: calc(100% - 70px);
+  height: 100%;
   background: #ececec;
   pointer-events: auto;
   -webkit-tap-highlight-color: rgba(0,0,0,0);

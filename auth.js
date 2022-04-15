@@ -15,14 +15,16 @@ module.exports = function (app, myDatabase) {
       done(null, doc);
     });
   });
-  passport.use(new LocalStrategy(
-    function(username, password, done) {      
+  passport.use(new LocalStrategy({ passReqToCallback: true },
+    function(req, username, password, done) {      
       myDatabase.findOne({ username: username }, function(err, user) {
-        console.log('User ' + username + ' attempted to log in.');
+        req.session.messages = [];
         if (err) { return done(err); }
-        if (!user) { return done(null, false); }
+        if (!user) { 
+          return done(null, false, { message: 'Incorrect username or password' }); 
+        }
         if (!bcrypt.compareSync(password, user.password)) { 
-          return done(null, false); 
+          return done(null, false, { message: 'Incorrect username or password' }); 
         }
         return done(null, user);
       });
@@ -35,7 +37,6 @@ module.exports = function (app, myDatabase) {
     callbackURL: 'https://chat-app.ryandantzler.repl.co/auth/github/callback'
   },
     function(accessToken, refreshToken, profile, cb) {
-      // console.log(profile);
       myDatabase.findOneAndUpdate(
         { id: profile.id },
         {

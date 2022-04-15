@@ -1,6 +1,6 @@
 const passport = require('passport');
 const bcrypt = require('bcrypt');
-const { body, validationResult } = require('express-validator');
+const { check, body, validationResult } = require('express-validator');
 
 const validate = validations => {
   return async (req, res, next) => {
@@ -10,10 +10,31 @@ const validate = validations => {
     if (errors.isEmpty()) {
       return next();
     }
+
+    req.session.messages = req.session.messages || [];
+    for (error of errors.array()) {
+      req.session.messages.push(error.msg);
+    }
     
-    res.send({ error: errors.array({ onlyFirstError: true })[0].msg });
+    res.redirect(req.originalUrl);
+    // next(new Error(errors.array({ onlyFirstError: true })[0].msg));
   }
 };
+
+const registerValidate = [
+  body('username', 'Username is a required field').exists()
+    .trim().escape(),
+  body('password', 'Password is a required field').exists()
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches('[0-9]').withMessage('Password must contain a number')
+    .matches('[A-Z]').withMessage('Password must contain an uppercase letter')
+    .trim().escape(),
+  // body('name', 'Name is a required field').exists()
+  //   .trim().escape(),
+  // body('email', 'Email is a required field')
+  //   .isEmail().withMessage('Email must be a valid email address')
+  //   .trim().escape().normalizeEmail()
+];
 
 const avatars = [
   'https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Blonde&facialHairType=BeardMajestic&facialHairColor=Blonde&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Pizza&eyeType=Wink&eyebrowType=SadConcernedNatural&mouthType=Smile&skinColor=Light',
@@ -27,7 +48,6 @@ const avatars = [
 module.exports = function (app, myDatabase) {
   app.route('/').get((req, res) => {
     if(req.isAuthenticated()) {
-      console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
         message: 'Welcome back, ' + req.user.name,
@@ -37,9 +57,15 @@ module.exports = function (app, myDatabase) {
         loggedIn: true
       });
     } else {
+      let errorMessages = null;
+      if (req.session && req.session.messages) {
+        errorMessages = req.session.messages;
+        delete req.session.messages;
+      }
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Connected to Database', 
-        message: 'Please login', 
+        message: 'Please login',
+        errorMessages: errorMessages,
         showLogin: true,
         showRegistration: false,
         showSocialAuth: true
@@ -49,7 +75,6 @@ module.exports = function (app, myDatabase) {
 
     app.route('/login').get((req, res) => {
     if(req.isAuthenticated()) {
-      console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
         message: 'Welcome back, ' + req.user.name, 
@@ -71,7 +96,6 @@ module.exports = function (app, myDatabase) {
 
   app.route('/register').get((req, res) => {
     if(req.isAuthenticated()) {
-      console.log(req);
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Logged In', 
         message: 'Welcome back, ' + req.user.name, 
@@ -81,9 +105,15 @@ module.exports = function (app, myDatabase) {
         loggedIn: true
       });
     } else {
+      let errorMessages = null;
+      if (req.session && req.session.messages) {
+        errorMessages = req.session.messages;
+        delete req.session.messages;
+      }
       res.render(process.cwd() + '/views/pug/index', {
         title: 'Connected to Database', 
-        message: 'Please login', 
+        message: 'Please login',
+        errorMessages: errorMessages,
         showLogin: false,
         showRegistration: true,
         showSocialAuth: false
@@ -95,7 +125,7 @@ module.exports = function (app, myDatabase) {
       body('username', 'Username is a required field.').exists(),
       body('password', 'Password is a required field.').exists()
     ]),
-    passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+    passport.authenticate('local', { failureRedirect: '/', failureMessage: true }), (req, res) => {
       res.redirect('/profile');
     });
   
@@ -112,17 +142,16 @@ module.exports = function (app, myDatabase) {
     res.redirect('/');
   });
   
-  app.route('/register').post(validate([
-      body('username', 'Username is a required field.').exists(),
-      body('password', 'Password is a required field.').exists()
-    ]),
+  app.route('/register').post(validate(registerValidate),
     (req, res, next) => {
       const hash = bcrypt.hashSync(req.body.password, 12);
       myDatabase.findOne({ username: req.body.username }, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {
-          res.redirect('/'); // TODO: alert user that username is taken
+          req.session.messages = [ `Username '${req.body.username}' is already taken` ];
+          res.redirect('/register');
+          // next(new Error(`Username '${req.body.username}' is already taken`));
         } else {
           let rand = Math.floor(Math.random() * 6);
           myDatabase.insertOne({
@@ -156,6 +185,12 @@ module.exports = function (app, myDatabase) {
 
   app.use((req, res, next) => {
     res.status(404).type('text').send('Not Found');
+  });
+
+  // Error handling
+  app.use((err, req, res, next) => {
+    console.log(err.message);
+    res.status(400).send({ error: err.message });
   });
 };
 
