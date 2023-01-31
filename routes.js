@@ -158,6 +158,8 @@ module.exports = function (app, myDatabase) {
             username: req.body.username,
             password: hash,
             name: req.body.username,
+            created_on: new Date(),
+            last_login: new Date(),
             avatar: avatars[rand]
           }, (err, doc) => {
               if (err) {
@@ -179,6 +181,13 @@ module.exports = function (app, myDatabase) {
 
   app.route('/auth/github').get(passport.authenticate('github'));
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
+    req.session.user_id = req.user.id;
+    res.redirect('/chat');
+  });
+
+  app.route('/auth/google').get(passport.authenticate('google', { scope:
+  	[ 'email', 'profile' ] }));
+  app.route('/auth/google/callback').get(passport.authenticate('google', { successRedirect: '/chat', failureRedirect: '/' }), (req, res) => {
     req.session.user_id = req.user.id;
     res.redirect('/chat');
   });
